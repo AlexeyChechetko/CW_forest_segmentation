@@ -1,6 +1,5 @@
 name: data
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 jobs:
   create-patches:
     runs-on: ubuntu-latest
