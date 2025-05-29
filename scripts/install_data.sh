@@ -11,6 +11,3 @@ URL=$(wget -qO- "https://cloud-api.yandex.net/v1/disk/public/resources/download?
 wget -O data.zip "$URL"
 
 unzip data.zip
-
-ls -l .
-pwd
