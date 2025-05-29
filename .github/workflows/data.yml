@@ -23,30 +23,21 @@ jobs:
           poetry install --only patch --no-root
           poetry run python patch.py
 
-      - name: archive-patches
-        run: |
-          zip -r train.zip data/train/
-          zip -r val.zip data/val/
-          zip -r test.zip data/test/
-
       - name: save-train
         uses: actions/upload-artifact@v4
         with:
           name: train
-          path: |
-            train.zip
+          path: data/train
 
       - name: save-val
         uses: actions/upload-artifact@v4
         with:
           name: val
-          path: |
-            val.zip
+          path: data/val
 
       - name: save-test
         uses: actions/upload-artifact@v4
         with:
           name: test
-          path: |
-            test.zip
+          path: data/test
             
