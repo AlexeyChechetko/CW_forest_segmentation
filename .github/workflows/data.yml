@@ -19,7 +19,7 @@ jobs:
       - name: slice-image
         run: |
           pip install poetry
-          poetry install --only patch
+          poetry install --only patch --no-root
           python src/patch.py
 
       - name: archive-patches
