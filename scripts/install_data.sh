@@ -12,4 +12,5 @@ wget -O data.zip "$URL"
 
 unzip data.zip
 
-cd ..
+ls -l data
+pwd

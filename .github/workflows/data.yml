@@ -18,7 +18,7 @@ jobs:
 
       - name: slice-image
         run: |
-          cd src
+          pwd
           pip install poetry
           poetry install --only patch --no-root
           poetry run python src/patch.py
