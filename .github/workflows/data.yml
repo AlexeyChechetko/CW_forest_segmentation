@@ -24,7 +24,7 @@ jobs:
           pip install poetry
           poetry install --only patch --no-root
           pwd
-          poetry run python src/patch.py
+          poetry run python patch.py
 
       - name: archive-patches
         run: |
