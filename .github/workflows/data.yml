@@ -1,0 +1,14 @@
+name: data
+on: [push]
+jobs:
+  download-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x scripts/install_data.sh && scripts/install_data.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: data
+          path: |
+            data/satellite_image.tif
+            data/mask.tif
