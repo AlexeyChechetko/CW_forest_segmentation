@@ -1,14 +1,52 @@
 name: data
-on: [push]
+on:
+  workflow_dispatch:
 jobs:
-  download-data:
+  create-patches:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: chmod +x scripts/install_data.sh && scripts/install_data.sh
-      - uses: actions/upload-artifact@v4
+
+      - name: download-images
+        run: |
+          chmod +x scripts/install_data.sh
+          scripts/install_data.sh
+
+      - name: setup-python
+        uses: actions/setup-python@v4
         with:
-          name: data
+          python-version: 3.12
+
+      - name: slice-image
+        run: |
+          pip install poetry
+          poetry install --only patch
+          python src/patch.py
+
+      - name: archive-patches
+        run: |
+          zip -r train.zip data/train/
+          zip -r val.zip data/vat/
+          zip -r test.zip data/test/
+
+      - name: save-train
+        uses: actions/upload-artifact@v4
+        with:
+          name: train
           path: |
-            data/satellite_image.tif
-            data/mask.tif
+            train.zip
+
+      - name: save-val
+        uses: actions/upload-artifact@v4
+        with:
+          name: val
+          path: |
+            val.zip
+
+      - name: save-test
+        uses: actions/upload-artifact@v4
+        with:
+          name: test
+          path: |
+            test.zip
+            
