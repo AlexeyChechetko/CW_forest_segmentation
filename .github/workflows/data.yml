@@ -45,7 +45,7 @@ jobs:
     needs: [create-patches]
     runs-on: ubuntu-latest
     steps:
-        - run: cd data
+        - run: mkdir data && cd data
         - uses: actions/download-artifact@v4
           with:
             name: train
