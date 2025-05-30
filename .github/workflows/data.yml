@@ -1,5 +1,9 @@
 name: data
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - develop
 jobs:
   create-patches:
     runs-on: ubuntu-latest
