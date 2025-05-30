@@ -23,23 +23,11 @@ jobs:
           poetry install --only patch --no-root
           poetry run python patch.py
 
-      - name: save-train
+      - name: save-data
         uses: actions/upload-artifact@v4
         with:
-          name: train
-          path: data/train
-
-      - name: save-val
-        uses: actions/upload-artifact@v4
-        with:
-          name: val
-          path: data/val
-
-      - name: save-test
-        uses: actions/upload-artifact@v4
-        with:
-          name: test
-          path: data/test
+          name: data
+          path: data
 
   train:
     needs: [create-patches]
@@ -48,8 +36,8 @@ jobs:
         - uses: actions/checkout@v4
         - uses: actions/download-artifact@v4
           with:
-            name: train
-        - run: ls -l .
+            name: data
+        - run: ls -l . && ls -l data
         - run: cd src
 
             
