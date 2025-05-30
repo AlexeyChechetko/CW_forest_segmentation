@@ -52,7 +52,7 @@ class SegmentationDataset(Dataset):
             mask_condition = np.all(mask == color_array, axis=-1)
             label_image[mask_condition] = label
 
-        return label_image.astype(np.float32)
+        return label_image #.astype(np.float32)
 
 
 class Train:
@@ -118,6 +118,47 @@ class Train:
             print('avg val loss: %f' % avg_val_loss)
             self.val_losses.append(avg_val_loss)
 
+    def train2(self):
+        self.model.to(self.device)
+        self.model.train()
+        total_loss = 0
+
+        for images, masks in tqdm(self.train_dataloader):
+            images = images.to(device)
+            masks = masks.to(device)
+            masks = masks.long()
+            self.optimizer.zero_grad()
+
+            outputs = self.model(images)
+
+            loss = self.loss_fn(outputs, masks)
+
+            loss.backward()
+            self.optimizer.step()
+
+            total_loss += loss.item()
+
+        return total_loss / len(self.train_dataloader)
+
+    def validate2(self):
+        self.model.to(self.device)
+        self.model.eval()
+        total_loss = 0
+
+        with torch.no_grad():
+            for images, masks in tqdm(self.val_dataloader):
+                images = images.to(device)
+                masks = masks.to(device)
+                masks = masks.long()
+
+                outputs = self.model(images)
+
+                loss = self.loss_fn(outputs, masks)
+                total_loss += loss.item()
+
+        return total_loss / len(self.val_dataloader)
+
+
 
 
 if __name__ == '__main__':
@@ -150,8 +191,21 @@ if __name__ == '__main__':
     trainer = Train(unet_model, train_loader, val_loader, optim.Adam(unet_model.parameters(), lr=1e-3),
                        2, device, nn.CrossEntropyLoss())
 
-    trainer.train()
-    torch.save(unet_model.state_dict(), "../models/unet")
+    # trainer.train()
+    # torch.save(unet_model.state_dict(), "../models/unet")
+
+    EPOCHS = 10
+
+    for epoch in range(EPOCHS):
+        print(f"[INFO] Эпоха: {epoch + 1}/{EPOCHS}")
+
+        train_loss = trainer.train2()
+
+        val_loss = trainer.validate2()
+
+        print(f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
+
+    torch.save(unet_model.state_dict(), "../models/unet1")
 
 
 
