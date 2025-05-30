@@ -40,4 +40,15 @@ jobs:
         with:
           name: test
           path: data/test
+
+  train:
+    needs: [create-patches]
+    runs-on: ubuntu-latest
+    steps:
+        - run: cd data
+        - uses: actions/download-artifact@v4
+          with:
+            name: train
+        - run: ls -l .
+
             

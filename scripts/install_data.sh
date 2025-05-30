@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir data
-cd data
+cd data || exit
 
 YA_LINK="https://disk.yandex.ru/d/RdV0HxRmjCN4nw"
 
