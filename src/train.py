@@ -171,7 +171,7 @@ if __name__ == '__main__':
     trainer.train()
     trainer.save_model()
     trainer.plot_losses()
-    # test 1
+    # test 2
 
 
 
