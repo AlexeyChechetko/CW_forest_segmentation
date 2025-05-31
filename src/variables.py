@@ -19,7 +19,7 @@ else:
     device = torch.device("cpu")
     print("CPU")
 
-epochs = 2
+epochs = 30
 
 # Относительные пути до папок, куда запишутся результаты train, test
 path_to_train_results = '../results/train'
