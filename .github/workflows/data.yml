@@ -1,9 +1,6 @@
 name: data
 on:
-  push:
-    branches:
-      - master
-      - develop
+  push
 jobs:
   train:
     runs-on: ubuntu-latest
