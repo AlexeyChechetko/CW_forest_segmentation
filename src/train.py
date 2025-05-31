@@ -121,7 +121,7 @@ class Train:
             print(f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
 
     def save_model(self):
-        torch.save(self.model.state_dict(), "trained-model")
+        torch.save(self.model.state_dict(), "../trained-model")
 
     def plot_losses(self):
         plt.figure(figsize=(10, 5))
