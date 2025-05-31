@@ -5,7 +5,8 @@ jobs:
   train:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: cache-data
         uses: actions/cache@v4
@@ -22,6 +23,12 @@ jobs:
             scripts/install_data.sh $YA_LINK
           fi
 
+      - name: create-train-result-directory
+        run: |
+          mkdir results
+          cd results
+          mkdir train
+
       - name: setup-python
         uses: actions/setup-python@v4
         with:
@@ -32,15 +39,51 @@ jobs:
           cd src
           pip install poetry
           poetry install --no-root
-          poetry run python train.py
+          poetry run python trainer.py
 
-      - name: save-model
+      - name: save-train-results
         uses: actions/upload-artifact@v4
         with:
-          name: trained-model
-          path: trained-model
-          
-          
+          name: train-results
+          path: |
+            results/train
 
+  test:
+    need: train
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: download-trained-model
+        uses: actions/download-artifact@v4
+        with:
+          name: train-results
+          path: results/train
+
+      - name: create-test-result-directory
+        run: |
+          mkdir -p results
+          cd results
+          mkdir test
+
+      - name: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: test
+        run: |
+          cd src
+          pip install poetry
+          poetry install --no-root
+          poetry run python tester.py
+
+      - name: save-test-results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            results/test
 
             

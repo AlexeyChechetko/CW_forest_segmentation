@@ -80,11 +80,11 @@ def save_patches(patches: list, labels: list, split_type: str, base_dir: str, pr
 
 if __name__ == '__main__':
     # Создаем директории для патчей из train, val и test выборок
-    create_dirs('../data/')
+    create_dirs('../../data/')
 
     # Нарезаем изображение и маску на патчи
-    patches_image = slice_image(path_to_image='../data/satellite_image.tif', patch_shape=(256, 256))
-    patches_mask = slice_image(path_to_image='../data/mask.tif', patch_shape=(256, 256))
+    patches_image = slice_image(path_to_image='../../data/satellite_image.tif', patch_shape=(256, 256))
+    patches_mask = slice_image(path_to_image='../../data/mask.tif', patch_shape=(256, 256))
 
     print(f"- Количество патчей размера 256*256: {len(patches_image)}")
 
@@ -99,6 +99,6 @@ if __name__ == '__main__':
     print(f"- Размер test выборки: {len(test_images)}")
 
     # Сохраняем патчи
-    save_patches(train_images, train_labels, 'train', '../data/', 'patch')
-    save_patches(val_images, val_labels, 'val', '../data/', 'patch')
-    save_patches(test_images, test_labels, 'test', '../data/', 'patch')
+    save_patches(train_images, train_labels, 'train', '../../data/', 'patch')
+    save_patches(val_images, val_labels, 'val', '../../data/', 'patch')
+    save_patches(test_images, test_labels, 'test', '../../data/', 'patch')

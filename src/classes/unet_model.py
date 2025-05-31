@@ -76,17 +76,3 @@ class UNet(nn.Module):
         # outputs = torch.softmax(self.output_conv(d4), dim=1)
 
         return self.output_conv(d4)
-
-if __name__ == '__main__':
-    loss = nn.CrossEntropyLoss()
-    input1 = torch.randn(3, 5, requires_grad=True)
-    print(input1)
-    target = torch.empty(3, dtype=torch.long).random_(5)
-    print(target)
-    output = loss(input1, target)
-    output.backward()
-
-    logits = torch.randn(8, 4, 256, 256)  # Выход модели
-    targets = torch.randint(0, 4, (8, 256, 256))  # Метки классов
-    print(logits.shape)
-    print(targets.shape)
