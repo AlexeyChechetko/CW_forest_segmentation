@@ -1,15 +1,10 @@
-import sys
-
-# setting path
-sys.path.append('../src')
-
 import os
 import cv2
 import numpy as np
 from torch.utils.data import Dataset
 import torch
 import re
-import src.variables as variables
+import variables as variables
 
 
 def colormap_to_labelmap(mask):

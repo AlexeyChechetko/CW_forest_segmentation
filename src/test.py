@@ -1,15 +1,10 @@
-import sys
-
-# setting path
-sys.path.append('../src')
-
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import precision_score, recall_score, f1_score
-import src.variables as variables
+import variables as variables
 
 
 def make_predictions(outputs):

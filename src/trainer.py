@@ -1,15 +1,10 @@
-import sys
-
-# setting path
-sys.path.append('../src')
-
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
-from src.classes.unet_model import UNet
-from src.classes.dataset import SegmentationDataset
-import src.variables as variables
-from src.classes.train import Train
+from unet_model import UNet
+from dataset import SegmentationDataset
+import variables as variables
+from train import Train
 
 if __name__ == '__main__':
 
@@ -26,7 +21,7 @@ if __name__ == '__main__':
 
     # Обучение модели, сохранение модели, сохранение графика losses
     trainer = Train(unet_model, train_loader, val_loader, optim.Adam(unet_model.parameters(), lr=1e-3),
-                       variables.epochs, variables.device, nn.CrossEntropyLoss(), variables.path_to_train_results)
+                    variables.epochs, variables.device, nn.CrossEntropyLoss(), variables.path_to_train_results)
 
     trainer.train()
     trainer.save_model()
