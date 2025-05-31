@@ -7,12 +7,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: cache-data
+        uses: actions/cache@v4
+        with:
+          path: ./data
+          key: data
+
       - name: download-data
         env:
           YA_LINK: ${{ secrets.YA_LINK_DATA }}
         run: |
-          chmod +x scripts/install_data.sh 
-          scripts/install_data.sh $YA_LINK
+          if [ ! -d "./data" ]; then
+            chmod +x scripts/install_data.sh 
+            scripts/install_data.sh $YA_LINK
+          fi
 
       - name: setup-python
         uses: actions/setup-python@v4
@@ -30,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: trained-model
-          path: models/trained-model
+          path: trained-model
           
           
 

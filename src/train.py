@@ -121,7 +121,7 @@ class Train:
             print(f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
 
     def save_model(self):
-        torch.save(self.model.state_dict(), "../models/trained-model")
+        torch.save(self.model.state_dict(), "trained-model")
 
     def plot_losses(self):
         plt.figure(figsize=(10, 5))
@@ -132,6 +132,7 @@ class Train:
         plt.title('Train and Validation Losses')
         plt.legend()
         plt.grid(True)
+        plt.show()
         plt.savefig('Train_and_Validation_Losses.png')
 
 
@@ -165,7 +166,7 @@ if __name__ == '__main__':
 
     # Обучение модели, сохранение модели, сохранение графика losses
     trainer = Train(unet_model, train_loader, val_loader, optim.Adam(unet_model.parameters(), lr=1e-3),
-                       30, device, nn.CrossEntropyLoss())
+                       5, device, nn.CrossEntropyLoss())
 
     trainer.train()
     trainer.save_model()
