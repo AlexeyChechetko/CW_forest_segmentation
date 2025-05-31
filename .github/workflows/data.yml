@@ -5,56 +5,37 @@ on:
       - master
       - develop
 jobs:
-  create-patches:
+  train:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: download-images
+      - name: download-data
+        env:
+          YA_LINK: ${{ secrets.YA_LINK_DATA }}
         run: |
-          chmod +x scripts/install_data.sh
-          scripts/install_data.sh
+          chmod +x scripts/install_data.sh 
+          scripts/install_data.sh $YA_LINK
 
       - name: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      - name: slice-image
+      - name: train
         run: |
           cd src
           pip install poetry
-          poetry install --only patch --no-root
-          poetry run python patch.py
+          poetry install --no-root
+          poetry run python train.py
 
-      - name: save-train
+      - name: save-model
         uses: actions/upload-artifact@v4
         with:
-          name: train
-          path: data/train
+          name: trained-model
+          path: models/trained-model
+          
+          
 
-      - name: save-val
-        uses: actions/upload-artifact@v4
-        with:
-          name: val
-          path: data/val
-
-      - name: save-test
-        uses: actions/upload-artifact@v4
-        with:
-          name: test
-          path: data/test
-
-  train:
-    needs: [create-patches]
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v4
-        - uses: actions/download-artifact@v4
-          with:
-            name: train
-            path: data/train
-        - run: ls -lR . && ls -lR data
-        - run: cd src
 
             

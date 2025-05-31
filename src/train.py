@@ -8,6 +8,7 @@ import torch.optim as optim
 import torch.nn as nn
 from tqdm import tqdm
 from models.unet_model import UNet
+import matplotlib.pyplot as plt
 
 # Класс Dataset для патчей
 class SegmentationDataset(Dataset):
@@ -64,61 +65,10 @@ class Train:
         self.num_epoch = num_epoch
         self.device = device
         self.loss_fn = loss_fn
-
         self.train_losses = []
         self.val_losses = []
 
-    def train(self):
-        self.model.to(self.device)
-
-        for epoch in range(self.num_epoch):
-            # печатаем номер текущей эпохи
-            print('* Epoch %d/%d' % (epoch+1, self.num_epoch))
-
-            # 1. Обучаем сеть на картинках из train_loader
-            self.model.train()  # train mode
-
-            avg_train_loss = 0
-            for i, (X_batch, Y_batch) in tqdm(enumerate(self.train_dataloader)):
-                # переносим батч на GPU
-                X_batch, Y_batch = X_batch.to(self.device), Y_batch.to(self.device)
-                # получаем ответы сети на батч
-                Y_pred = self.model(X_batch)
-                # print(Y_pred.shape)
-                # print(Y_batch.shape)
-                Y_batch = Y_batch.long()
-                # считаем лосс, делаем шаг оптимизации сети
-                loss = self.loss_fn(Y_pred, Y_batch)
-                loss.backward()
-                self.optimizer.step()
-                self.optimizer.zero_grad()
-
-                avg_train_loss += loss / len(train_loader)
-
-            # выводим средний лосс на тренировочной выборке за эпоху
-            print('avg train loss: %f' % avg_train_loss)
-            self.train_losses.append(avg_train_loss)
-
-            # 2. Тестируем сеть на картинках из val_loader
-            self.model.eval()
-
-            avg_val_loss = 0
-            for i, (X_batch, Y_batch) in enumerate(self.val_dataloader):
-                # переносим батч на GPU
-                X_batch, Y_batch = X_batch.to(self.device), Y_batch.to(self.device)
-                # получаем ответы сети на батч
-                Y_pred = self.model(X_batch)
-                # считаем лосс на батче
-                Y_batch = Y_batch.long()
-                loss = self.loss_fn(Y_pred, Y_batch)
-
-                avg_val_loss += loss / len(val_loader)
-
-            # выводим средний лосс на валидационных данных
-            print('avg val loss: %f' % avg_val_loss)
-            self.val_losses.append(avg_val_loss)
-
-    def train2(self):
+    def train_step(self):
         self.model.to(self.device)
         self.model.train()
         total_loss = 0
@@ -140,7 +90,7 @@ class Train:
 
         return total_loss / len(self.train_dataloader)
 
-    def validate2(self):
+    def validate_step(self):
         self.model.to(self.device)
         self.model.eval()
         total_loss = 0
@@ -157,6 +107,32 @@ class Train:
                 total_loss += loss.item()
 
         return total_loss / len(self.val_dataloader)
+
+    def train(self):
+        for epoch in range(self.num_epoch):
+            print(f"[INFO] Эпоха: {epoch + 1}/{self.num_epoch}")
+
+            train_loss = self.train_step()
+            self.train_losses.append(train_loss)
+
+            val_loss = self.validate_step()
+            self.val_losses.append(val_loss)
+
+            print(f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
+
+    def save_model(self):
+        torch.save(self.model.state_dict(), "../models/trained-model")
+
+    def plot_losses(self):
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.train_losses, label='Train Loss', color='blue', marker='o')
+        plt.plot(self.val_losses, label='Validation Loss', color='red', marker='o')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Train and Validation Losses')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('Train_and_Validation_Losses.png')
 
 
 
@@ -187,25 +163,13 @@ if __name__ == '__main__':
         device = torch.device("cpu")
         print("CPU")
 
-    # self, model, train_dataloader, val_dataloader, optimizer, num_epoch, device, loss_fn
+    # Обучение модели, сохранение модели, сохранение графика losses
     trainer = Train(unet_model, train_loader, val_loader, optim.Adam(unet_model.parameters(), lr=1e-3),
-                       2, device, nn.CrossEntropyLoss())
+                       30, device, nn.CrossEntropyLoss())
 
-    # trainer.train()
-    # torch.save(unet_model.state_dict(), "../models/unet")
-
-    EPOCHS = 10
-
-    for epoch in range(EPOCHS):
-        print(f"[INFO] Эпоха: {epoch + 1}/{EPOCHS}")
-
-        train_loss = trainer.train2()
-
-        val_loss = trainer.validate2()
-
-        print(f"Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
-
-    torch.save(unet_model.state_dict(), "../models/unet1")
+    trainer.train()
+    trainer.save_model()
+    trainer.plot_losses()
 
 
 
