@@ -1,3 +1,8 @@
+import sys
+
+# setting path
+sys.path.append('../src')
+
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt

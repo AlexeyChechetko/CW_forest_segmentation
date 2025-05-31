@@ -1,10 +1,15 @@
+import sys
+
+# setting path
+sys.path.append('../src')
+
 from src.classes.unet_model import UNet
-from classes.dataset import SegmentationDataset
+from src.classes.dataset import SegmentationDataset
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import src.variables as variables
-from classes.test import Test
+from src.classes.test import Test
 
 if __name__ == '__main__':
     # Путь к сохраненной модели

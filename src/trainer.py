@@ -1,10 +1,15 @@
+import sys
+
+# setting path
+sys.path.append('../src')
+
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 from src.classes.unet_model import UNet
-from classes.dataset import SegmentationDataset
+from src.classes.dataset import SegmentationDataset
 import src.variables as variables
-from classes.train import Train
+from src.classes.train import Train
 
 if __name__ == '__main__':
 

@@ -1,3 +1,8 @@
+import sys
+
+# setting path
+sys.path.append('../src')
+
 import os
 import cv2
 import numpy as np
