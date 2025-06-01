@@ -1,4 +1,4 @@
-name: data
+name: train_and_test
 on:
   push
 jobs:
