@@ -21,5 +21,6 @@ if __name__ == '__main__':
     tester.visualize_segmentation_examples(0, 5)
     tester.visualize_segmentation_examples(20, 5)
     tester.visualize_segmentation_examples(50, 5)
+    tester.visualize_segmentation_examples(30, 5)
     test_loss, test_precision, test_recall, test_f1 = tester.test(nn.CrossEntropyLoss())
     print(f"Test Loss: {test_loss:.4f}, Test Precision: {test_precision:.4f}, Test Recall: {test_recall:.4f}, Test F1 Score: {test_f1:.4f}")

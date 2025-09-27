@@ -72,6 +72,7 @@ class Train:
         torch.save(self.model.state_dict(), self.path_to_results + '/trained-model')
 
     def plot_losses(self):
+        # TODO: сделать график по оси x от 1 до self.num_epoch
         plt.figure(figsize=(10, 5))
         plt.plot(self.train_losses, label='Train Loss', color='blue', marker='o')
         plt.plot(self.val_losses, label='Validation Loss', color='red', marker='o')
