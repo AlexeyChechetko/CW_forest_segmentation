@@ -1,10 +1,10 @@
 import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import numpy as np
 
+# Класс Train для обучения моделей
 class Train:
-    def __init__(self, model, train_dataloader, val_dataloader, optimizer, num_epoch, device, loss_fn, path_to_results, compute_weight_map=None):
+    def __init__(self, model, train_dataloader, val_dataloader, optimizer, num_epoch, device, loss_fn, train_weight_map, val_weight_map, path_to_results):
         self.model = model
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
@@ -12,36 +12,36 @@ class Train:
         self.num_epoch = num_epoch
         self.device = device
         self.loss_fn = loss_fn
-        self.compute_weight_map = compute_weight_map  # <== добавляем сюда функцию
         self.train_losses = []
         self.val_losses = []
         self.path_to_results = path_to_results
+        self.train_weight_map = train_weight_map
+        self.val_weight_map = val_weight_map
 
     def train_step(self):
         self.model.to(self.device)
         self.model.train()
         total_loss = 0
 
-        for images, masks in tqdm(self.train_dataloader):
+        for images, masks, masks_paths in tqdm(self.train_dataloader):
             images = images.to(self.device)
-            masks = masks.to(self.device).long()
+            masks = masks.to(self.device)
+            masks = masks.long()
             self.optimizer.zero_grad()
 
             outputs = self.model(images)
 
-            if self.compute_weight_map is not None:
-                weight_map = torch.from_numpy(self.compute_weight_map(masks.cpu().numpy().astype(np.int64))).to(self.device)
+            train_weight_maps = torch.stack([self.train_weight_map[k] for k in masks_paths], dim=0) # shape: [B,H,W]
 
-                # Важно: loss_fn должен возвращать покомпонентный loss
-                # т.е. reduction='none'
-                per_pixel_loss = self.loss_fn(outputs, masks)  # shape: [B,H,W]
-                weighted_loss = (per_pixel_loss * weight_map).mean()
-                loss = weighted_loss
-            else:
-                loss = self.loss_fn(outputs, masks)
+            # Важно: loss_fn должен возвращать покомпонентный loss
+            # т.е. reduction='none'
+            per_pixel_loss = self.loss_fn(outputs, masks)  # shape: [B,H,W]
+            weighted_loss = (per_pixel_loss * train_weight_maps).mean()
+            loss = weighted_loss
 
             loss.backward()
             self.optimizer.step()
+
             total_loss += loss.item()
 
         return total_loss / len(self.train_dataloader)
@@ -52,18 +52,21 @@ class Train:
         total_loss = 0
 
         with torch.no_grad():
-            for images, masks in tqdm(self.val_dataloader):
+            for images, masks, masks_paths in tqdm(self.val_dataloader):
                 images = images.to(self.device)
-                masks = masks.to(self.device).long()
+                masks = masks.to(self.device)
+                masks = masks.long()
 
                 outputs = self.model(images)
 
-                if self.compute_weight_map is not None:
-                    weight_map = torch.from_numpy(self.compute_weight_map(masks.cpu().numpy().astype(np.int64))).to(self.device)
-                    per_pixel_loss = self.loss_fn(outputs, masks)
-                    loss = (per_pixel_loss * weight_map).mean()
-                else:
-                    loss = self.loss_fn(outputs, masks)
+                val_weight_maps = torch.stack([self.val_weight_map[k] for k in masks_paths],
+                                                dim=0)  # shape: [B,H,W]
+
+                # Важно: loss_fn должен возвращать покомпонентный loss
+                # т.е. reduction='none'
+                per_pixel_loss = self.loss_fn(outputs, masks)  # shape: [B,H,W]
+                weighted_loss = (per_pixel_loss * val_weight_maps).mean()
+                loss = weighted_loss
 
                 total_loss += loss.item()
 
@@ -85,6 +88,7 @@ class Train:
         torch.save(self.model.state_dict(), self.path_to_results + '/trained-model')
 
     def plot_losses(self):
+        # TODO: сделать график по оси x от 1 до self.num_epoch
         plt.figure(figsize=(10, 5))
         plt.plot(self.train_losses, label='Train Loss', color='blue', marker='o')
         plt.plot(self.val_losses, label='Validation Loss', color='red', marker='o')

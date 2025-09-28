@@ -49,4 +49,4 @@ class SegmentationDataset(Dataset):
         mask = torch.tensor(mask, dtype=torch.float32)
         image = torch.tensor(image, dtype=torch.float32)
 
-        return image, mask
+        return image, mask, self.mask_paths[idx]

@@ -33,19 +33,12 @@ def make_picture_from_mask(mask):
     return image_mask
 
 class Test:
-    def __init__(self, model, test_dataset, test_dataloader, weight_map, device, path_to_results):
+    def __init__(self, model, test_dataset, test_dataloader, device, path_to_results):
         self.model = model
         self.test_dataset = test_dataset
         self.test_dataloader = test_dataloader
-        self.weight_map = weight_map
         self.device = device
         self.path_to_results = path_to_results
-
-    def weighted_cross_entropy(self, logits, target):
-        # logits: (N,C,H,W), target: (N,H,W), weight_map: (N,H,W)
-        ce = nn.CrossEntropyLoss(logits, target, reduction='none')  # (N,H,W)
-        weighted_loss = (ce * self.weight_map).mean()
-        return weighted_loss
 
     def test(self, criterion):
         self.model.to(self.device)
@@ -55,13 +48,13 @@ class Test:
         all_labels = []
 
         with torch.no_grad():
-            for images, masks in tqdm(self.test_dataloader):
+            for images, masks, masks_paths in tqdm(self.test_dataloader):
                 images = images.to(self.device)
                 masks = masks.to(self.device)
                 masks = masks.long()
 
                 outputs = self.model(images)
-                loss = self.weight_map(outputs, masks)
+                loss = criterion(outputs, masks)
                 test_loss += loss.item()
 
                 predictions = make_predictions(outputs)
@@ -95,7 +88,7 @@ class Test:
         with torch.no_grad():
             plt.figure(figsize=(15, num_examples * 5))
             for i in range(start, num_examples + start):
-                image, mask = self.test_dataset[i]
+                image, mask, mask_path = self.test_dataset[i]
                 image = image.unsqueeze(0)
 
                 output = self.model(image)

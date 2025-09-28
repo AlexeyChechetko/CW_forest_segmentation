@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 # Цвета маски
 mask_label_map = {0: [0, 0, 0],  # black
@@ -19,8 +20,14 @@ else:
     device = torch.device("cpu")
     print("CPU")
 
+# Веса классов пикселей
+weights = np.array([ 1.0000,  1 / 1.9331,  1 / 6.8020, 1 / 27.7462])
+weights_torch = torch.tensor([ 1.0000,  1 / 1.9331,  1 / 6.8020, 1 / 27.7462]).to(device)
+
+# Количество эпох обучения
 epochs = 30
 
 # Относительные пути до папок, куда запишутся результаты train, test
 path_to_train_results = '../results/train'
 path_to_test_results = '../results/test'
+
