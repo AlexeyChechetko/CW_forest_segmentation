@@ -21,8 +21,8 @@ else:
     print("CPU")
 
 # Веса классов пикселей
-weights = np.array([ 1.0000,  1 / 1.9331,  1 / 6.8020, 1 / 27.7462])
-weights_torch = torch.tensor([ 1.0000,  1 / 1.9331,  1 / 6.8020, 1 / 27.7462]).to(device)
+weights = np.array([ 1 / 27.7462, 1 / 1.9331,  1 / 6.8020, 1.0000 ])
+weights_torch = torch.tensor([ 1 / 27.7462, 1 / 1.9331,  1 / 6.8020, 1.0000 ]).to(device)
 
 # Количество эпох обучения
 epochs = 30
