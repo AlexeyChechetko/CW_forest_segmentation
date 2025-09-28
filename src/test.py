@@ -33,12 +33,19 @@ def make_picture_from_mask(mask):
     return image_mask
 
 class Test:
-    def __init__(self, model, test_dataset, test_dataloader, device, path_to_results):
+    def __init__(self, model, test_dataset, test_dataloader, weight_map, device, path_to_results):
         self.model = model
         self.test_dataset = test_dataset
         self.test_dataloader = test_dataloader
+        self.weight_map = weight_map
         self.device = device
         self.path_to_results = path_to_results
+
+    def weighted_cross_entropy(self, logits, target):
+        # logits: (N,C,H,W), target: (N,H,W), weight_map: (N,H,W)
+        ce = nn.CrossEntropyLoss(logits, target, reduction='none')  # (N,H,W)
+        weighted_loss = (ce * self.weight_map).mean()
+        return weighted_loss
 
     def test(self, criterion):
         self.model.to(self.device)
@@ -54,7 +61,7 @@ class Test:
                 masks = masks.long()
 
                 outputs = self.model(images)
-                loss = criterion(outputs, masks)
+                loss = self.weight_map(outputs, masks)
                 test_loss += loss.item()
 
                 predictions = make_predictions(outputs)

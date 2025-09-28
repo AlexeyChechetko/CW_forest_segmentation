@@ -1,10 +1,10 @@
 import torch
 
 # Цвета маски
-mask_label_map = {0: [255, 96, 55],  # red
+mask_label_map = {0: [0, 0, 0],  # black
                   1: [250, 250, 55],  # yellow
                   2: [36, 179, 83],  # green
-                  3: [0, 0, 0]}  # black
+                  3: [255, 96, 55]}  # red
 
 # Относительные пути до train, val, test выборок
 path_to_train_data = '../data/train'

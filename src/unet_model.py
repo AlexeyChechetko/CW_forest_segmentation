@@ -73,6 +73,4 @@ class UNet(nn.Module):
         d4 = self.decoder4(d3, s1)
 
 
-        # outputs = torch.softmax(self.output_conv(d4), dim=1)
-
         return self.output_conv(d4)
