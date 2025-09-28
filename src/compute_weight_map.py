@@ -49,11 +49,11 @@ def compute_maps(train_dataset, val_dataset):
 
     # Создаем для train_dataset
     for image, _mask, mask_name in train_dataset:
-        train_weight_map[mask_name] = torch.from_numpy(compute_weight_map(mask=_mask.numpy().astype(np.int64), wc=variables.weights,
-                                                         w0=3, sigma=5)).to(variables.device)
+        train_weight_map[mask_name] = torch.from_numpy(compute_weight_map(mask=_mask.numpy().astype(np.int64), wc=None,
+                                                         w0=1, sigma=5)).to(variables.device)
     # Создаем для val_dataset
     for image, _mask, mask_name in val_dataset:
-        val_weight_map[mask_name] = torch.from_numpy(compute_weight_map(mask=_mask.numpy().astype(np.int64), wc=variables.weights, w0=3,
+        val_weight_map[mask_name] = torch.from_numpy(compute_weight_map(mask=_mask.numpy().astype(np.int64), wc=None, w0=1,
                                                        sigma=5)).to(variables.device)
 
     # Можно сохранить в текстовый файл карты для проверки
