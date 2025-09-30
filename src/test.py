@@ -6,6 +6,39 @@ from tqdm import tqdm
 from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
 import variables as variables
 
+def iou_per_class(y_true, y_pred, num_classes):
+    """
+    Считает IoU для каждого класса.
+    y_true, y_pred : np.ndarray
+        2D или 3D массивы (H,W) или (N,H,W)
+    num_classes : int
+        Количество классов (например 3)
+
+    return: словарь {класс: IoU}
+    """
+    ious = {}
+    for cls in range(num_classes):
+        # создаем маски для текущего класса
+        true_mask = (y_true == cls)
+        pred_mask = (y_pred == cls)
+
+        intersection = np.logical_and(true_mask, pred_mask).sum()
+        union = np.logical_or(true_mask, pred_mask).sum()
+
+        if union == 0:
+            ious[cls] = float('nan')  # класс отсутствует
+        else:
+            ious[cls] = intersection / union
+    return ious
+
+
+def mean_iou(y_true, y_pred, num_classes):
+    """
+    Считает средний IoU по всем классам (mIoU).
+    """
+    ious = iou_per_class(y_true, y_pred, num_classes)
+    values = [v for v in ious.values() if not np.isnan(v)]
+    return np.mean(values), ious
 
 def make_predictions(outputs):
     classes_prediction = nn.Softmax(dim=1)(outputs).squeeze()
@@ -106,6 +139,10 @@ class Test:
 
         all_predictions = np.concatenate(all_predictions, axis=0)
         all_labels = np.concatenate(all_labels, axis=0)
+
+        miou, ious = mean_iou(all_labels, all_predictions, num_classes=4)
+        print("IoU по классам:", ious)
+        print("Средний mIoU:", miou)
 
         precision, recall, f1 = evaluate_segmentation(all_labels, all_predictions, ignore_class=3)
 

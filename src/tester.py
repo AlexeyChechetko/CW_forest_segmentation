@@ -19,6 +19,8 @@ if __name__ == '__main__':
 
     tester = Test(unet_model, test_dataset, test_loader, variables.device, variables.path_to_test_results)
     tester.visualize_segmentation_examples(0, 5)
+    tester.visualize_segmentation_examples(6, 5)
+    tester.visualize_segmentation_examples(13, 5)
     tester.visualize_segmentation_examples(20, 5)
     tester.visualize_segmentation_examples(50, 5)
     test_loss, test_precision, test_recall, test_f1 = tester.test(nn.CrossEntropyLoss())
