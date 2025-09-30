@@ -3,7 +3,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
 import variables as variables
 
 
@@ -31,6 +31,48 @@ def make_picture_from_mask(mask):
             image_mask[i, j, :] = variables.mask_label_map[mask[i, j].item()]
 
     return image_mask
+
+
+def evaluate_segmentation(y_true, y_pred, ignore_class=0):
+    """
+    Оценка качества многоклассовой сегментации.
+    Фон (ignore_class) исключается из метрик.
+
+    Parameters
+    ----------
+    y_true : np.ndarray
+        Истинные значения классов (H×W или 1D).
+    y_pred : np.ndarray
+        Предсказанные значения классов (H×W или 1D).
+    ignore_class : int, optional
+        Класс, который нужно игнорировать (по умолчанию 0).
+    """
+    # преобразуем в 1D
+    y_true = y_true.flatten()
+    y_pred = y_pred.flatten()
+
+    # фильтруем фон
+    mask = y_true != ignore_class
+    y_true_f = y_true[mask]
+    y_pred_f = y_pred[mask]
+
+    classes = np.unique(y_true_f)
+    target_names = [f"class_{c}" for c in classes]
+
+    # precision, recall, f1
+    precision = precision_score(y_true_f, y_pred_f, labels=classes, average="macro")
+    recall = recall_score(y_true_f, y_pred_f, labels=classes, average="macro")
+    f1 = f1_score(y_true_f, y_pred_f, labels=classes, average="macro")
+
+    print("🔹 Метрики по классам (без фона):")
+    print(classification_report(y_true_f, y_pred_f, labels=classes, target_names=target_names))
+
+    print("🔹 Усреднённые метрики (macro):")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall:    {recall:.4f}")
+    print(f"F1-score:  {f1:.4f}")
+
+    return precision, recall, f1
 
 class Test:
     def __init__(self, model, test_dataset, test_dataloader, device, path_to_results):
@@ -65,12 +107,7 @@ class Test:
         all_predictions = np.concatenate(all_predictions, axis=0)
         all_labels = np.concatenate(all_labels, axis=0)
 
-        all_predictions = all_predictions.flatten()
-        all_labels = all_labels.flatten()
-
-        precision = precision_score(all_labels, all_predictions, average='weighted')
-        recall = recall_score(all_labels, all_predictions, average='weighted')
-        f1 = f1_score(all_labels, all_predictions, average='weighted')
+        precision, recall, f1 = evaluate_segmentation(all_labels, all_predictions, ignore_class=3)
 
         avg_loss = test_loss / len(self.test_dataset)
 
