@@ -84,6 +84,12 @@ def evaluate_segmentation(y_true, y_pred, ignore_class=0):
     y_true = y_true.flatten()
     y_pred = y_pred.flatten()
 
+    # найдем количество угаданных пикселей по каждому классу
+    for i in range(4):
+        mask = y_pred == i
+        y_pred_temp = y_pred[mask]
+        print(f"{i}: {len(y_pred_temp)}")
+
     # фильтруем фон
     mask = y_true != ignore_class
     y_true_f = y_true[mask]
