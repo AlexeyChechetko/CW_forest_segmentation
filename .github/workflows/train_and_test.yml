@@ -1,13 +1,17 @@
 name: train_and_test
 on:
-  push
+  push:
+    branches:
+      - master
+      - develop
+      - 'releases/**'
 jobs:
   train:
     runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+# test
       - name: cache-data
         uses: actions/cache@v4
         with:
