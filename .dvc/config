@@ -1,0 +1,8 @@
+[core]
+    remote = local-s3
+['remote "local-s3"']
+    url = s3://ml-storage
+    endpointurl = http://localhost:9000
+    access_key_id = minioadmin
+    secret_access_key = minioadmin
+    use_ssl = false
